@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
@@ -13,7 +14,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Routes
+// Serve static frontend files
+app.use(express.static(path.join(__dirname, '..', 'public')));
+
+// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/maps', mapsRoutes);
 app.use('/api/ai', aiRoutes);
@@ -24,9 +28,9 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'OK', message: 'Backend is running' });
 });
 
-// Root endpoint
-app.get('/', (req, res) => {
-    res.status(200).send('LogiTrack AI API is running.');
+// SPA fallback — serve index.html for all non-API routes
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
 
 module.exports = app;
